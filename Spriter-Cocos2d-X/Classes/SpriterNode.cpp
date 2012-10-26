@@ -230,6 +230,26 @@ void SpriterTimelineKey::setSpin(int spin)
     _spin = spin;
 }
 
+double SpriterTimelineKey::getScaleX()
+{
+    return _scaleX;
+}
+
+void SpriterTimelineKey::setScaleX(double scaleX)
+{
+    _scaleX = scaleX;
+}
+
+double SpriterTimelineKey::getScaleY()
+{
+    return _scaleY;
+}
+
+void SpriterTimelineKey::setScaleY(double scaleY)
+{
+    _scaleY = scaleY;
+}
+
 SpriterAnimation::SpriterAnimation()
 {
     _mainline = new CCArray();
@@ -299,6 +319,8 @@ CCArray* SpriterAnimation::getTimelines()
 
 SpriterNode::SpriterNode()
 {
+    _playbackSpeed = 1.0;
+    
     _configRoot = NULL;
     _curConfigNode = NULL;
     
@@ -503,6 +525,25 @@ void SpriterNode::initObjects()
                                 timelineKey->setStartsAt(key->getPropertyCCString("time")->doubleValue());
                                 timelineKey->setRotation(object->getPropertyCCString("angle")->doubleValue());
                                 
+                                if(object->getPropertyCCString("scale_x")->doubleValue())
+                                {
+                                    timelineKey->setScaleX(object->getPropertyCCString("scale_x")->doubleValue());
+                                }
+                                else
+                                {
+                                    timelineKey->setScaleX(1.0);
+                                }
+                                
+                                if(object->getPropertyCCString("scale_y")->doubleValue())
+                                {
+                                    timelineKey->setScaleY(object->getPropertyCCString("scale_y")->doubleValue());
+                                }
+                                else
+                                {
+                                    timelineKey->setScaleY(1.0);
+                                }
+                                    
+                                
                                 if (key->getPropertyCCString("spin")->intValue())
                                 {
                                     timelineKey->setSpin(key->getPropertyCCString("spin")->intValue());
@@ -591,11 +632,11 @@ void SpriterNode::update(float dt)
     
     _duration += dt;
     
-    int milliseconds = _duration * 10000;
+    int milliseconds = _duration * 10000 * _playbackSpeed;
     int startTime = _curKeyFrame->getStartsAt();
     int endTime = _nextKeyFrame->getStartsAt();
     
-    if (endTime)
+    if (endTime == 0.0f)
     {
         endTime = _curAnimation->getDuration();
     }
@@ -610,8 +651,8 @@ void SpriterNode::update(float dt)
     }
     if (milliseconds > _curAnimation->getDuration())
     {
-        _duration -= milliseconds * 0.0001;
-        milliseconds -= 10000;
+        _duration -= milliseconds * 0.0001/_playbackSpeed;
+        milliseconds -= 10000 * _playbackSpeed;
     }
     
     for (int i=0; i<_spriteNodes->count(); i++)
@@ -670,6 +711,9 @@ void SpriterNode::update(float dt)
                 interpolate(curTimelineKey->getAnchorPoint().x, nextTimelineKey->getAnchorPoint().x, interpolationFactor),
                 interpolate(curTimelineKey->getAnchorPoint().y, nextTimelineKey->getAnchorPoint().y, interpolationFactor)));
         
+        sprite->setScaleX(interpolate(curTimelineKey->getScaleX(), nextTimelineKey->getScaleX(), interpolationFactor));
+        sprite->setScaleY(interpolate(curTimelineKey->getScaleY(), nextTimelineKey->getScaleY(), interpolationFactor));
+        
         double nextRotation = nextTimelineKey->getRotation();
         double curRotation = curTimelineKey->getRotation();
         
@@ -680,6 +724,20 @@ void SpriterNode::update(float dt)
         else if(curTimelineKey->getSpin() == -1 && (nextRotation - curRotation ) >0)
         {
             nextRotation -= 360;
+        }
+        
+        // check to flip
+        if(_isFlipX)
+        {
+            // position
+            sprite->setPosition(CCPointMake(-sprite->getPosition().x, sprite->getPosition().y));
+            
+            // scale
+            sprite->setScaleX(-sprite->getScaleX());
+            
+            // rotation
+            nextRotation *= -1;
+            curRotation *= -1;
         }
         
         sprite->setRotation( - interpolate(curRotation, nextRotation, interpolationFactor) );
@@ -693,4 +751,26 @@ double SpriterNode::interpolate(double a, double b, double f)
     if (f > 1) { f = 1.0; }
     if (f == NAN) { f = 1.0; }
     return a+(b-a)*f;
+}
+
+double SpriterNode::getPlaybackSpeed()
+{
+    return _playbackSpeed;
+}
+
+void SpriterNode::setPlaybackSpeed(double pSpeed)
+{
+    if(pSpeed != _playbackSpeed)
+        _playbackSpeed = pSpeed;
+}
+
+bool SpriterNode::getIsFlipX()
+{
+    return _isFlipX;
+}
+
+void SpriterNode::setIsFlipX(bool b)
+{
+    if(b != _isFlipX)
+        _isFlipX = b;
 }

@@ -65,15 +65,17 @@ public:
     , m_bIsEnabled(false)            
     , m_pListener(NULL)            
     , m_pfnSelector(NULL)
-    , m_nScriptHandler(0)
+    , m_nScriptTapHandler(0)
     {}
     virtual ~CCMenuItem();
     /** Creates a CCMenuItem with a target/selector 
     @deprecated: This interface will be deprecated sooner or later.
     */
     CC_DEPRECATED_ATTRIBUTE static CCMenuItem * itemWithTarget(CCObject *rec, SEL_MenuHandler selector);
+    /** Creates a CCMenuItem with no target/selector */
+    static CCMenuItem* create();
     /** Creates a CCMenuItem with a target/selector */
-    static CCMenuItem * create(CCObject *rec, SEL_MenuHandler selector);
+    static CCMenuItem* create(CCObject *rec, SEL_MenuHandler selector);
     /** Initializes a CCMenuItem with a target/selector */
     bool initWithTarget(CCObject *rec, SEL_MenuHandler selector);
     /** Returns the outside box */
@@ -86,9 +88,10 @@ public:
     virtual void unselected();
     
     /** Register menu handler script function */
-    virtual void registerScriptHandler(int nHandler);
-    virtual void unregisterScriptHandler(void);
-    
+    virtual void registerScriptTapHandler(int nHandler);
+    virtual void unregisterScriptTapHandler(void);
+    int getScriptTapHandler() { return m_nScriptTapHandler; };
+
     virtual bool isEnabled();
     //@note: It's 'setIsEnable' in cocos2d-iphone. 
     virtual void setEnabled(bool value);
@@ -96,10 +99,11 @@ public:
     
     /** set the target/selector of the menu item*/
     void setTarget(CCObject *rec, SEL_MenuHandler selector);
+
 protected:
     CCObject*       m_pListener;
     SEL_MenuHandler    m_pfnSelector;
-    int             m_nScriptHandler;
+    int             m_nScriptTapHandler;
 };
 
 /** @brief An abstract class for "label" CCMenuItemLabel items 
@@ -125,14 +129,14 @@ public:
     @deprecated: This interface will be deprecated sooner or later.
     */
     CC_DEPRECATED_ATTRIBUTE static CCMenuItemLabel * itemWithLabel(CCNode*label, CCObject* target, SEL_MenuHandler selector);
-    /** creates a CCMenuItemLabel with a Label. Target and selector will be nill 
+    /** creates a CCMenuItemLabel with a Label. Target and selector will be nil 
     @deprecated: This interface will be deprecated sooner or later.
     */
     CC_DEPRECATED_ATTRIBUTE static CCMenuItemLabel* itemWithLabel(CCNode *label);
 
     /** creates a CCMenuItemLabel with a Label, target and selector */
     static CCMenuItemLabel * create(CCNode*label, CCObject* target, SEL_MenuHandler selector);
-    /** creates a CCMenuItemLabel with a Label. Target and selector will be nill */
+    /** creates a CCMenuItemLabel with a Label. Target and selector will be nil */
     static CCMenuItemLabel* create(CCNode *label);
 
     /** initializes a CCMenuItemLabel with a Label, target and selector */
@@ -159,6 +163,7 @@ protected:
     float        m_fOriginalScale;
 };
 
+
 /** @brief A CCMenuItemAtlasFont
  Helper class that creates a MenuItemLabel class with a LabelAtlas
  */
@@ -183,6 +188,7 @@ public:
     /** initializes a menu item from a string and atlas with a target/selector */
     bool initWithString(const char *value, const char *charMapFile, int itemWidth, int itemHeight, char startCharMap, CCObject* target, SEL_MenuHandler selector);
 };
+
 
 /** @brief A CCMenuItemFont
  Helper class that creates a CCMenuItemLabel class with a Label
@@ -240,6 +246,7 @@ protected:
     unsigned int m_uFontSize;
     std::string m_strFontName;
 };
+
 
 /** @brief CCMenuItemSprite accepts CCNode<CCRGBAProtocol> objects as items.
  The images has 3 different states:
@@ -304,6 +311,7 @@ protected:
     virtual void updateImagesVisibility();
 };
 
+
 /** @brief CCMenuItemImage accepts images as items.
  The images has 3 different states:
  - unselected image
@@ -362,9 +370,10 @@ public:
     static CCMenuItemImage* create();
 };
 
+
 /** @brief A CCMenuItemToggle
  A simple container class that "toggles" it's inner items
- The inner itmes can be any MenuItem
+ The inner items can be any MenuItem
  */
 class CC_DLL CCMenuItemToggle : public CCMenuItem, public CCRGBAProtocol
 {
@@ -394,6 +403,9 @@ public:
     /** creates a menu item from a list of items with a target/selector */
     static CCMenuItemToggle* createWithTarget(CCObject* target, SEL_MenuHandler selector, CCMenuItem* item, ...);  
 
+    /** creates a menu item with no target/selector and no items */
+    static CCMenuItemToggle* create();
+
     /** initializes a menu item from a list of items with a target selector */
     bool initWithTarget(CCObject* target, SEL_MenuHandler selector, CCMenuItem* item, va_list args);
     
@@ -422,7 +434,8 @@ public:
     virtual void setOpacityModifyRGB(bool bValue) {CC_UNUSED_PARAM(bValue);}
     virtual bool isOpacityModifyRGB(void) { return false;}
 };
-    
+
+
 // end of GUI group
 /// @}
 /// @}

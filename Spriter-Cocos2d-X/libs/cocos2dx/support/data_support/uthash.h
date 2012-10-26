@@ -28,8 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stddef.h>   /* ptrdiff_t */
 #include <stdlib.h>   /* exit() */
 
-namespace   cocos2d {
-
 /* These macros use decltype or the earlier __typeof GNU extension.
    As decltype is only available in newer compilers (VS2010 or gcc 4.3+
    when compiling c++ source) this code uses whatever method is needed
@@ -64,7 +62,7 @@ do {                                                                            
 } while(0)
 #endif
 
-/* uint32_t next definded will conflict with other libraries and an "error C2872: 'uint32_t' : ambiguous symbol" will appear.
+/* uint32_t next defined will conflict with other libraries and an "error C2872: 'uint32_t' : ambiguous symbol" will appear.
    so we replace all uint32_t with 'unsigned int'.
 */
 /* a number of the hash function use uint32_t which isn't defined on win32 */
@@ -983,6 +981,5 @@ typedef struct UT_hash_handle {
    unsigned keylen;                  /* enclosing struct's key len     */
    unsigned hashv;                   /* result of hash-fcn(key)        */
 } UT_hash_handle;
-}//namespace   cocos2d 
 
 #endif /* __SUPPORT_DATA_SUPPORT_UTHASH_H__*/

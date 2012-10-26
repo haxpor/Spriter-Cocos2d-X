@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2009 Jason Booth
 
 http://www.cocos2d-x.org
@@ -310,14 +310,17 @@ public:
     */
     CC_DEPRECATED_ATTRIBUTE static CCEaseElastic* actionWithAction(CCActionInterval *pAction, float fPeriod = 0.3f);
     /** Creates the action with the inner action and the period in radians (default is 0.3) */
-    static CCEaseElastic* create(CCActionInterval *pAction, float fPeriod = 0.3f);
+    static CCEaseElastic* create(CCActionInterval *pAction, float fPeriod);
+    static CCEaseElastic* create(CCActionInterval *pAction) {
+        return CCEaseElastic::create(pAction, 0.3f);
+    }
 protected:
     float m_fPeriod;
 };
 
 /** 
  @brief Ease Elastic In action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */
@@ -334,12 +337,15 @@ public:
     */
     CC_DEPRECATED_ATTRIBUTE static CCEaseElasticIn* actionWithAction(CCActionInterval *pAction, float fPeriod = 0.3f);
     /** Creates the action with the inner action and the period in radians (default is 0.3) */
-    static CCEaseElasticIn* create(CCActionInterval *pAction, float fPeriod = 0.3f);
+    static CCEaseElasticIn* create(CCActionInterval *pAction, float fPeriod);
+    static CCEaseElasticIn* create(CCActionInterval *pAction) {
+        return CCEaseElasticIn::create(pAction, 0.3f);
+    }
 };
 
 /** 
  @brief Ease Elastic Out action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */
@@ -357,12 +363,15 @@ public:
     CC_DEPRECATED_ATTRIBUTE static CCEaseElasticOut* actionWithAction(CCActionInterval *pAction, float fPeriod = 0.3f);
 
     /** Creates the action with the inner action and the period in radians (default is 0.3) */
-    static CCEaseElasticOut* create(CCActionInterval *pAction, float fPeriod = 0.3f);
+    static CCEaseElasticOut* create(CCActionInterval *pAction, float fPeriod);
+    static CCEaseElasticOut* create(CCActionInterval *pAction) {
+        return CCEaseElasticOut::create(pAction, 0.3f);
+    }
 };
 
 /** 
  @brief Ease Elastic InOut action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */
@@ -380,7 +389,10 @@ public:
     CC_DEPRECATED_ATTRIBUTE static CCEaseElasticInOut* actionWithAction(CCActionInterval *pAction, float fPeriod = 0.3f);
 
     /** Creates the action with the inner action and the period in radians (default is 0.3) */
-    static CCEaseElasticInOut* create(CCActionInterval *pAction, float fPeriod = 0.3f);
+    static CCEaseElasticInOut* create(CCActionInterval *pAction, float fPeriod);
+    static CCEaseElasticInOut* create(CCActionInterval *pAction) {
+        return CCEaseElasticInOut::create(pAction, 0.3f);
+    }
 };
 
 /** 
@@ -428,7 +440,7 @@ public:
 
 /** 
  @brief EaseBounceOut action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */
@@ -450,7 +462,7 @@ public:
 
 /** 
  @brief CCEaseBounceInOut action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */
@@ -472,7 +484,7 @@ public:
 
 /** 
  @brief CCEaseBackIn action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */
@@ -494,7 +506,7 @@ public:
 
 /** 
  @brief CCEaseBackOut action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */
@@ -516,7 +528,7 @@ public:
 
 /** 
  @brief CCEaseBackInOut action.
- @warning This action doesn't use a bijective fucntion. Actions like Sequence might have an unexpected result when used with this action.
+ @warning This action doesn't use a bijective function. Actions like Sequence might have an unexpected result when used with this action.
  @since v0.8.2
  @ingroup Actions
  */

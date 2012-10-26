@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -931,7 +931,7 @@ void CCLabelBMFont::createFontChars()
         // Color MUST be set before opacity, since opacity might change color if OpacityModifyRGB is on
         fontChar->setColor(m_tColor);
 
-        // only apply opaccity if it is different than 255 )
+        // only apply opacity if it is different than 255 )
         // to prevent modifying the color too (issue #610)
         if( m_cOpacity != 255 )
         {
@@ -1260,6 +1260,12 @@ void CCLabelBMFont::updateLabel()
             {
                 float lineWidth = 0.0f;
                 unsigned int line_length = last_line.size();
+				// if last line is empty we must just increase lineNumber and work with next line
+                if (line_length == 0)
+                {
+                    lineNumber++;
+                    continue;
+                }
                 int index = i + line_length - 1 + lineNumber;
                 if (index < 0) continue;
 

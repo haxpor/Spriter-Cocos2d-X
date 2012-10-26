@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2011      Erawppa
 http://www.cocos2d-x.org
 
@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include "CCNotificationCenter.h"
 #include "cocoa/CCArray.h"
+#include "script_support/CCScriptSupport.h"
 #include <string>
 
 using namespace std;
@@ -33,6 +34,7 @@ NS_CC_BEGIN;
 static CCNotificationCenter *s_sharedNotifCenter = NULL;
 
 CCNotificationCenter::CCNotificationCenter()
+: m_scriptHandler(0)
 {
     m_observers = CCArray::createWithCapacity(3);
     m_observers->retain();
@@ -40,6 +42,7 @@ CCNotificationCenter::CCNotificationCenter()
 
 CCNotificationCenter::~CCNotificationCenter()
 {
+    unregisterScriptObserver();
     m_observers->release();
 }
 
@@ -111,6 +114,21 @@ void CCNotificationCenter::removeObserver(CCObject *target,const char *name)
     }
 }
 
+void CCNotificationCenter::registerScriptObserver(int handler)
+{
+    unregisterScriptObserver();
+    m_scriptHandler = handler;
+}
+
+void CCNotificationCenter::unregisterScriptObserver(void)
+{
+    if (m_scriptHandler)
+    {
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeScriptHandler(m_scriptHandler);
+    }
+    m_scriptHandler = 0;
+}
+
 void CCNotificationCenter::postNotification(const char *name, CCObject *object)
 {
     CCObject* obj = NULL;
@@ -120,8 +138,14 @@ void CCNotificationCenter::postNotification(const char *name, CCObject *object)
         if (!observer)
             continue;
         
-        if (!strcmp(name,observer->getName()))
+        if (!strcmp(name,observer->getName()) && (observer->getObject() == object || observer->getObject() == NULL || object == NULL))
             observer->performSelector(object);
+    }
+
+    if (m_scriptHandler)
+    {
+        CCScriptEngineProtocol* engine = CCScriptEngineManager::sharedManager()->getScriptEngine();
+        engine->executeNotificationEvent(this, name);
     }
 }
 
@@ -153,15 +177,18 @@ CCNotificationObserver::CCNotificationObserver(CCObject *target,
 
 CCNotificationObserver::~CCNotificationObserver()
 {
-    if (m_name)
-        delete m_name;
+    CC_SAFE_DELETE_ARRAY(m_name);
 }
 
 void CCNotificationObserver::performSelector(CCObject *obj)
 {
     if (m_target)
     {
-        (m_target->*m_selector)(obj);
+		if (obj) {
+			(m_target->*m_selector)(obj);
+		} else {
+			(m_target->*m_selector)(m_object);
+		}
     }
 }
 

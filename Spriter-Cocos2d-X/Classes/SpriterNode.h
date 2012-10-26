@@ -108,6 +108,12 @@ public:
     
     int getSpin();
     void setSpin(int spin);
+    
+    double getScaleX();
+    void setScaleX(double scaleX);
+    
+    double getScaleY();
+    void setScaleY(double scaleY);
 
 private:
     int _file;
@@ -119,6 +125,8 @@ private:
     CCPoint _anchorPoint;
     double _rotation;
     int _spin;
+    double _scaleX;
+    double _scaleY;
 };
 
 class SpriterTimeline : public CCObject
@@ -177,6 +185,21 @@ public:
     void textHandler(void *ctx, const char *ch, int len);
     
     void runAnimation(const char* animation);
+    
+    bool getIsFlipX();
+    void setIsFlipX(bool b);
+    
+    /** pSpeed is in percentage, it can be
+        1.0 (Normal Speed)
+        5.0 (5x speed)
+        0.25 (0.25x speed)
+        many more
+     
+        This value can be manually grabbed from Spriter editor, but measure in percentage.
+    **/
+    double getPlaybackSpeed();
+    void setPlaybackSpeed(double pSpeed);
+    
 private:
     CCString *_characterName;
     
@@ -204,6 +227,9 @@ private:
     bool initNodeWithFile(const char *scmlFile);
     void update(float dt);
     double interpolate(double a, double b, double f);
+    
+    bool _isFlipX;
+    double _playbackSpeed;
 };
 
 

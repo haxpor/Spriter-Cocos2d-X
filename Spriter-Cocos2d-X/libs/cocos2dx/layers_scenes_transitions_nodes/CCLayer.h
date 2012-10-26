@@ -119,6 +119,7 @@ public:
     bool isKeypadEnabled();
     void setKeypadEnabled(bool value);
     
+    inline CCTouchScriptHandlerEntry* getScriptHandlerEntry() { return m_pScriptHandlerEntry; };
 protected:   
     bool m_bIsTouchEnabled;
     bool m_bIsAccelerometerEnabled;
@@ -130,7 +131,7 @@ private:
     int  excuteScriptTouchHandler(int nEventType, CCTouch *pTouch);
     int  excuteScriptTouchHandler(int nEventType, CCSet *pTouches);
 };
-    
+
 //
 // CCLayerColor
 //
@@ -147,7 +148,6 @@ protected:
     ccColor4F  m_pSquareColors[4];
 
 public:
-
     CCLayerColor();
     virtual ~CCLayerColor();
 
@@ -199,6 +199,7 @@ protected:
     virtual void updateColor();
 };
 
+
 //
 // CCLayerGradient
 //
@@ -225,6 +226,7 @@ If ' compressedInterpolation' is enabled (default mode) you will see both the st
 class CC_DLL CCLayerGradient : public CCLayerColor
 {
 public:
+
     /** Creates a full-screen CCLayer with a gradient between start and end. 
     @deprecated: This interface will be deprecated sooner or later.
     */
@@ -269,6 +271,7 @@ protected:
     virtual void updateColor();
 };
 
+
 /** @brief CCMultipleLayer is a CCLayer with the ability to multiplex it's children.
 Features:
 - It supports one or more children
@@ -280,7 +283,6 @@ protected:
     unsigned int m_nEnabledLayer;
     CCArray*     m_pLayers;
 public:
-
     CCLayerMultiplex();
     virtual ~CCLayerMultiplex();
 
@@ -291,7 +293,7 @@ public:
 
     /**
      * lua script can not init with undetermined number of variables
-     * so add these functinons to be used with lua.
+     * so add these functions to be used with lua.
      @deprecated: This interface will be deprecated sooner or later.
      */
     CC_DEPRECATED_ATTRIBUTE static CCLayerMultiplex * layerWithLayer(CCLayer* layer);
@@ -301,7 +303,7 @@ public:
 
     /**
      * lua script can not init with undetermined number of variables
-     * so add these functinons to be used with lua.
+     * so add these functions to be used with lua.
      */
     static CCLayerMultiplex * createWithLayer(CCLayer* layer);
 
@@ -323,6 +325,7 @@ public:
 
     CREATE_FUNC(CCLayerMultiplex)
 };
+
 
 // end of layer group
 /// @}

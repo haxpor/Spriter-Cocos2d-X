@@ -91,11 +91,16 @@ CCNode::CCNode(void)
     m_pActionManager->retain();
     m_pScheduler = director->getScheduler();
     m_pScheduler->retain();
+
+    CCScriptEngineProtocol* pEngine = CCScriptEngineManager::sharedManager()->getScriptEngine();
+    m_eScriptType = pEngine != NULL ? pEngine->getScriptType() : kScriptTypeNone;
 }
 
 CCNode::~CCNode(void)
 {
     CCLOGINFO( "cocos2d: deallocing" );
+    
+    unregisterScriptHandler();
 
     CC_SAFE_RELEASE(m_pActionManager);
     CC_SAFE_RELEASE(m_pScheduler);
@@ -121,7 +126,6 @@ CCNode::~CCNode(void)
 
     // children
     CC_SAFE_RELEASE(m_pChildren);
-
 }
 
 float CCNode::getSkewX()
@@ -169,7 +173,7 @@ void CCNode::setZOrder(int z)
     }
 }
 
-/// ertexZ getter
+/// vertexZ getter
 float CCNode::getVertexZ()
 {
     return m_fVertexZ;
@@ -489,7 +493,7 @@ CCNode* CCNode::getChildByTag(int aTag)
 }
 
 /* "add" logic MUST only be on this method
-* If a class want's to extend the 'addChild' behaviour it only needs
+* If a class want's to extend the 'addChild' behavior it only needs
 * to override this method
 */
 void CCNode::addChild(CCNode *child, int zOrder, int tag)
@@ -679,7 +683,7 @@ void CCNode::sortAllChildren()
  {
      //CCAssert(0);
      // override me
-     // Only use- this function to draw your staff.
+     // Only use- this function to draw your stuff.
      // DON'T draw your stuff outside this method
  }
 
@@ -796,20 +800,30 @@ void CCNode::onEnter()
 
     m_bIsRunning = true;
 
-    if (m_nScriptHandler)
+    if (m_eScriptType != kScriptTypeNone)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeFunctionWithIntegerData(m_nScriptHandler, kCCNodeOnEnter);
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnEnter);
     }
 }
 
 void CCNode::onEnterTransitionDidFinish()
 {
     arrayMakeObjectsPerformSelector(m_pChildren, onEnterTransitionDidFinish, CCNode*);
+
+    if (m_eScriptType == kScriptTypeJavascript)
+    {
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnEnterTransitionDidFinish);
+    }
 }
 
 void CCNode::onExitTransitionDidStart()
 {
     arrayMakeObjectsPerformSelector(m_pChildren, onExitTransitionDidStart, CCNode*);
+
+    if (m_eScriptType == kScriptTypeJavascript)
+    {
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnExitTransitionDidStart);
+    }
 }
 
 void CCNode::onExit()
@@ -818,9 +832,9 @@ void CCNode::onExit()
 
     m_bIsRunning = false;
 
-    if (m_nScriptHandler)
+    if ( m_eScriptType != kScriptTypeNone)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeFunctionWithIntegerData(m_nScriptHandler, kCCNodeOnExit);
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeNodeEvent(this, kCCNodeOnExit);
     }
 
     arrayMakeObjectsPerformSelector(m_pChildren, onExit, CCNode*);
@@ -837,7 +851,7 @@ void CCNode::unregisterScriptHandler(void)
 {
     if (m_nScriptHandler)
     {
-        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeLuaHandler(m_nScriptHandler);
+        CCScriptEngineManager::sharedManager()->getScriptEngine()->removeScriptHandler(m_nScriptHandler);
         LUALOG("[LUA] Remove CCNode event handler: %d", m_nScriptHandler);
         m_nScriptHandler = 0;
     }

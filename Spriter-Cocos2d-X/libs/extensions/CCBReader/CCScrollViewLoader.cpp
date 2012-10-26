@@ -1,6 +1,6 @@
 #include "CCScrollViewLoader.h"
 
-USING_NS_CC;
+
 
 #define PROPERTY_CONTAINER "container"
 #define PROPERTY_DIRECTION "direction"
@@ -9,6 +9,14 @@ USING_NS_CC;
 #define PROPERTY_SCALE "scale"
 
 NS_CC_EXT_BEGIN
+
+void CCScrollViewLoader::onHandlePropTypeSize(CCNode * pNode, CCNode * pParent, CCString * pPropertyName, CCSize pSize, CCBReader * pCCBReader) {
+	if(pPropertyName->compare(PROPERTY_CONTENTSIZE) == 0) {
+		((CCScrollView *)pNode)->setViewSize(pSize);
+	} else {
+		CCNodeLoader::onHandlePropTypeSize(pNode, pParent, pPropertyName, pSize, pCCBReader);
+	}
+}
 
 void CCScrollViewLoader::onHandlePropTypeCheck(CCNode * pNode, CCNode * pParent, CCString * pPropertyName, bool pCheck, CCBReader * pCCBReader) {
     if(pPropertyName->compare(PROPERTY_CLIPSTOBOUNDS) == 0) {
@@ -23,6 +31,7 @@ void CCScrollViewLoader::onHandlePropTypeCheck(CCNode * pNode, CCNode * pParent,
 void CCScrollViewLoader::onHandlePropTypeCCBFile(CCNode * pNode, CCNode * pParent, CCString * pPropertyName, CCNode * pCCBFileNode, CCBReader * pCCBReader) {
     if(pPropertyName->compare(PROPERTY_CONTAINER) == 0) {
         ((CCScrollView *)pNode)->setContainer(pCCBFileNode);
+		((CCScrollView *)pNode)->updateInset();
     } else {
         CCNodeLoader::onHandlePropTypeCCBFile(pNode, pParent, pPropertyName, pCCBFileNode, pCCBReader);
     }

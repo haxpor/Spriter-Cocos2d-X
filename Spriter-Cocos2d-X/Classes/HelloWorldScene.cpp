@@ -1,6 +1,5 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
-#include "SpriterNode.h"
 
 using namespace cocos2d;
 using namespace CocosDenshion;
@@ -29,21 +28,27 @@ bool HelloWorld::init()
     {
         return false;
     }
+    
+    // create a label to tell who see the demo
+    CCLabelTTF* label = CCLabelTTF::create("Flip X every 2 seconds.\nLeft monster should have bigger head.", "Thonburi", 30);
+    CCSize size = CCDirector::sharedDirector()->getWinSize();
+    label->setPosition( ccp(size.width / 2, size.height - 40) );
+    this->addChild(label, 1);
 
-    SpriterNode *n = SpriterNode::create( "Example.SCML" );
+    n1 = SpriterNode::create( "Example.SCML" );
+    n1->setPosition( ccp(200, 100) );
+    n1->runAnimation( "Idle" );
     
-    n->setPosition( ccp(200, 100) );
-    n->runAnimation( "Idle" );
-    
-    this->addChild( n );
+    this->addChild( n1 );
     
     CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile( "monster.plist" );
-    n = SpriterNode::create( "Example.SCML", "monster.png" );
+    n2 = SpriterNode::create( "Example.SCML", "monster.png" );
     
-    n->setPosition( ccp(600, 100) );
-    n->runAnimation( "Posture" );
+    n2->setPosition( ccp(600, 100) );
+    n2->runAnimation( "Posture" );
     
-    this->addChild( n );
+    this->addChild( n2 );
+    this->schedule(schedule_selector(HelloWorld::_flipSpriteX), 2);
     
     return true;
 }
@@ -55,4 +60,21 @@ void HelloWorld::menuCloseCallback(CCObject* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+
+void HelloWorld::_flipSpriteX(float df)
+{
+    // switch back and forth for flipping
+    if(n1->getIsFlipX() && n2->getIsFlipX())
+    {
+        n1->setIsFlipX(false);
+        n2->setIsFlipX(false);
+    }
+    else if(!n1->getIsFlipX() && !n1->getIsFlipX())
+    {
+        n1->setIsFlipX(true);
+        n2->setIsFlipX(true);
+    }
+    
+    CCLog("Called _flipSprite()");
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -151,7 +151,7 @@ static void* loadImage(void* data)
         CCImage::EImageFormat imageType = computeImageFormatType(pAsyncStruct->filename);
         if (imageType == CCImage::kFmtUnKnown)
         {
-            CCLOG("unsupportted format %s",filename);
+            CCLOG("unsupported format %s",filename);
             delete pAsyncStruct;
             
             continue;
@@ -414,7 +414,8 @@ CCTexture2D * CCTextureCache::addImage(const char * path)
         // all images are handled by UIImage except PVR extension that is handled by our own handler
         do 
         {
-            if (std::string::npos != lowerCase.find(".pvr"))
+            if (std::string::npos != lowerCase.find(".pvr") ||
+                std::string::npos != lowerCase.find(".pvrtc"))
             {
                 texture = this->addPVRImage(fullpath.c_str());
             }
@@ -437,8 +438,15 @@ CCTexture2D * CCTextureCache::addImage(const char * path)
                 CCImage image;                
                 unsigned long nSize = 0;
                 unsigned char* pBuffer = CCFileUtils::sharedFileUtils()->getFileData(fullpath.c_str(), "rb", &nSize);
-                CC_BREAK_IF(! image.initWithImageData((void*)pBuffer, nSize, eImageFormat));
-                CC_SAFE_DELETE_ARRAY(pBuffer);
+                if (! image.initWithImageData((void*)pBuffer, nSize, eImageFormat))
+                {
+                    CC_SAFE_DELETE_ARRAY(pBuffer);
+                    break;
+                }
+                else
+                {
+                    CC_SAFE_DELETE_ARRAY(pBuffer);
+                }                
 
                 texture = new CCTexture2D();
                 
@@ -468,7 +476,7 @@ CCTexture2D * CCTextureCache::addImage(const char * path)
 #ifdef CC_SUPPORT_PVRTC
 CCTexture2D* CCTextureCache::addPVRTCImage(const char* path, int bpp, bool hasAlpha, int width)
 {
-    CCAssert(path != NULL, "TextureCache: fileimage MUST not be nill");
+    CCAssert(path != NULL, "TextureCache: fileimage MUST not be nil");
     CCAssert( bpp==2 || bpp==4, "TextureCache: bpp must be either 2 or 4");
 
     CCTexture2D * texture;
@@ -506,7 +514,7 @@ CCTexture2D* CCTextureCache::addPVRTCImage(const char* path, int bpp, bool hasAl
 
 CCTexture2D * CCTextureCache::addPVRImage(const char* path)
 {
-    CCAssert(path != NULL, "TextureCache: fileimage MUST not be nill");
+    CCAssert(path != NULL, "TextureCache: fileimage MUST not be nil");
 
     CCTexture2D* texture = NULL;
     std::string key(path);
@@ -539,7 +547,7 @@ CCTexture2D * CCTextureCache::addPVRImage(const char* path)
 
 CCTexture2D* CCTextureCache::addUIImage(CCImage *image, const char *key)
 {
-    CCAssert(image != NULL, "TextureCache: image MUST not be nill");
+    CCAssert(image != NULL, "TextureCache: image MUST not be nil");
 
     CCTexture2D * texture = NULL;
     // textureForKey() use full path,so the key should be full path
@@ -713,6 +721,10 @@ VolatileTexture::VolatileTexture(CCTexture2D *t)
 , m_fFontSize(0.0f)
 {
     m_size = CCSizeMake(0, 0);
+    m_texParams.minFilter = GL_LINEAR;
+    m_texParams.magFilter = GL_LINEAR;
+    m_texParams.wrapS = GL_CLAMP_TO_EDGE;
+    m_texParams.wrapT = GL_CLAMP_TO_EDGE;
     textures.push_back(this);
 }
 
@@ -799,6 +811,20 @@ void VolatileTexture::addStringTexture(CCTexture2D *tt, const char* text, const 
     vt->m_vAlignment  = vAlignment;
     vt->m_fFontSize   = fontSize;
     vt->m_strText     = text;
+}
+
+void VolatileTexture::setTexParameters(CCTexture2D *t, ccTexParams *texParams) 
+{
+    VolatileTexture *vt = findVolotileTexture(t);
+
+    if (texParams->minFilter != GL_NONE)
+        vt->m_texParams.minFilter = texParams->minFilter;
+    if (texParams->magFilter != GL_NONE)
+        vt->m_texParams.magFilter = texParams->magFilter;
+    if (texParams->wrapS != GL_NONE)
+        vt->m_texParams.wrapS = texParams->wrapS;
+    if (texParams->wrapT != GL_NONE)
+        vt->m_texParams.wrapT = texParams->wrapT;
 }
 
 void VolatileTexture::removeTexture(CCTexture2D *t) 
@@ -890,6 +916,7 @@ void VolatileTexture::reloadAllTextures()
         default:
             break;
         }
+        vt->texture->setTexParameters(&vt->m_texParams);
     }
 
     isReloading = false;

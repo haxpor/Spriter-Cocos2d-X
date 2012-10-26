@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2009-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include "shaders/CCGLProgram.h"
 #include "support/CCPointExtension.h"
 #include "support/data_support/ccCArray.h"
-#include "support/CCNotificationCenter.h"
-#include "CCEventType.h"
 #include "CCDirector.h"
 
 NS_CC_BEGIN
@@ -99,24 +97,9 @@ bool CCTMXLayer::initWithTilesetInfo(CCTMXTilesetInfo *tilesetInfo, CCTMXLayerIn
         m_bUseAutomaticVertexZ = false;
         m_nVertexZvalue = 0;
         
-        
-        // listen the event of "EVNET_COME_TO_FOREGROUND", this event only trigged on android
-        CCNotificationCenter::sharedNotificationCenter()->addObserver(this,
-                                                                      callfuncO_selector(CCTMXLayer::listenBackToForeground),
-                                                                      EVNET_COME_TO_FOREGROUND,
-                                                                      NULL);
-        
         return true;
     }
     return false;
-}
-
-void CCTMXLayer::listenBackToForeground(CCObject *sender)
-{
-    if (m_pobTextureAtlas)
-    {
-        m_pobTextureAtlas->getTexture()->setAliasTexParameters();
-    }
 }
 
 CCTMXLayer::CCTMXLayer()
@@ -143,8 +126,6 @@ CCTMXLayer::~CCTMXLayer()
     }
 
     CC_SAFE_DELETE_ARRAY(m_pTiles);
-    
-    CCNotificationCenter::sharedNotificationCenter()->removeObserver(this, EVNET_COME_TO_FOREGROUND);
 }
 
 CCTMXTilesetInfo * CCTMXLayer::getTileSet()
@@ -218,7 +199,7 @@ void CCTMXLayer::setupTiles()
     }
 
     CCAssert( m_uMaxGID >= m_pTileSet->m_uFirstGid &&
-        m_uMinGID >= m_pTileSet->m_uFirstGid, "TMX: Only 1 tilset per layer is supported");    
+        m_uMinGID >= m_pTileSet->m_uFirstGid, "TMX: Only 1 tileset per layer is supported");    
 }
 
 // CCTMXLayer - Properties
@@ -325,7 +306,7 @@ CCSprite* CCTMXLayer::reusedTileWithRect(CCRect rect)
     }
     else
     {
-        // XXX: should not be re-init. Potential memeory leak. Not following best practices
+        // XXX: should not be re-init. Potential memory leak. Not following best practices
         // XXX: it shall call directory  [setRect:rect]
         m_pReusedTile->initWithTexture(m_pobTextureAtlas->getTexture(), rect, false);
 
@@ -404,7 +385,7 @@ CCSprite * CCTMXLayer::insertTileForGID(unsigned int gid, const CCPoint& pos)
     CCRect rect = m_pTileSet->rectForGID(gid);
     rect = CC_RECT_PIXELS_TO_POINTS(rect);
 
-    int z = (int)(pos.x + pos.y * m_tLayerSize.width);
+    intptr_t z = (intptr_t)(pos.x + pos.y * m_tLayerSize.width);
 
     CCSprite *tile = reusedTileWithRect(rect);
 
@@ -466,7 +447,7 @@ CCSprite * CCTMXLayer::appendTileForGID(unsigned int gid, const CCPoint& pos)
     CCRect rect = m_pTileSet->rectForGID(gid);
     rect = CC_RECT_PIXELS_TO_POINTS(rect);
 
-    int z = (int)(pos.x + pos.y * m_tLayerSize.width);
+    intptr_t z = (intptr_t)(pos.x + pos.y * m_tLayerSize.width);
 
     CCSprite *tile = reusedTileWithRect(rect);
 

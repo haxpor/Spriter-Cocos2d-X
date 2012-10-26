@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2011      Zynga Inc.
 
@@ -161,9 +161,10 @@ void CCTimer::update(float dt)
                 {
                     (m_pTarget->*m_pfnSelector)(m_fElapsed);
                 }
+
                 if (m_nScriptHandler)
                 {
-                    CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(m_nScriptHandler, m_fElapsed);
+                    CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(this, m_fElapsed);
                 }
                 m_fElapsed = 0;
             }
@@ -179,10 +180,12 @@ void CCTimer::update(float dt)
                     {
                         (m_pTarget->*m_pfnSelector)(m_fElapsed);
                     }
+
                     if (m_nScriptHandler)
                     {
-                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(m_nScriptHandler, m_fElapsed);
+                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(this, m_fElapsed);
                     }
+
                     m_fElapsed = m_fElapsed - m_fDelay;
                     m_nTimesExecuted+=1;
                     m_bUseDelay = false;
@@ -196,10 +199,12 @@ void CCTimer::update(float dt)
                     {
                         (m_pTarget->*m_pfnSelector)(m_fElapsed);
                     }
+
                     if (m_nScriptHandler)
                     {
-                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(m_nScriptHandler, m_fElapsed);
+                        CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(this, m_fElapsed);
                     }
+
                     m_fElapsed = 0;
                     m_nTimesExecuted += 1;
 
@@ -370,7 +375,7 @@ void CCScheduler::priorityIn(tListEntry **ppList, CCObject *pTarget, int nPriori
     pListElement->next = pListElement->prev = NULL;
     pListElement->markedForDeletion = false;
 
-    // empey list ?
+    // empty list ?
     if (! *ppList)
     {
         DL_APPEND(*ppList, pListElement);
@@ -605,14 +610,14 @@ void CCScheduler::unscheduleAllSelectorsForTarget(CCObject *pTarget)
 
 unsigned int CCScheduler::scheduleScriptFunc(unsigned int nHandler, float fInterval, bool bPaused)
 {
-    CCSchedulerScriptHandlerEntry* pEntry = CCSchedulerScriptHandlerEntry::entryWithHandler(nHandler, fInterval, bPaused);
+    CCSchedulerScriptHandlerEntry* pEntry = CCSchedulerScriptHandlerEntry::create(nHandler, fInterval, bPaused);
     if (!m_pScriptHandlerEntries)
     {
         m_pScriptHandlerEntries = CCArray::createWithCapacity(20);
         m_pScriptHandlerEntries->retain();
     }
     m_pScriptHandlerEntries->addObject(pEntry);
-    return pEntry->getEntryID();
+    return pEntry->getEntryId();
 }
 
 void CCScheduler::unscheduleScriptEntry(unsigned int uScheduleScriptEntryID)
@@ -620,7 +625,7 @@ void CCScheduler::unscheduleScriptEntry(unsigned int uScheduleScriptEntryID)
     for (int i = m_pScriptHandlerEntries->count() - 1; i >= 0; i--)
     {
         CCSchedulerScriptHandlerEntry* pEntry = static_cast<CCSchedulerScriptHandlerEntry*>(m_pScriptHandlerEntries->objectAtIndex(i));
-        if (pEntry->getEntryID() == uScheduleScriptEntryID)
+        if (pEntry->getEntryId() == uScheduleScriptEntryID)
         {
             pEntry->markedForDeletion();
             break;
@@ -758,7 +763,7 @@ void CCScheduler::update(float dt)
         dt *= m_fTimeScale;
     }
 
-    // Iterate all over the Updates selectors
+    // Iterate over all the Updates' selectors
     tListEntry *pEntry, *pTmp;
 
     // updates with priority < 0
@@ -775,6 +780,12 @@ void CCScheduler::update(float dt)
     {
         if ((! pEntry->paused) && (! pEntry->markedForDeletion))
         {
+            CCScriptEngineProtocol* pEngine = CCScriptEngineManager::sharedManager()->getScriptEngine();
+            if (pEngine != NULL && kScriptTypeJavascript == pEngine->getScriptType())
+            {
+                CCScriptEngineManager::sharedManager()->getScriptEngine()->executeSchedule(NULL, dt, (CCNode *)pEntry->target);
+            }
+            
             pEntry->target->update(dt);            
         }
     }
@@ -788,7 +799,7 @@ void CCScheduler::update(float dt)
         }
     }
 
-    // Interate all over the custom selectors
+    // Iterate over all the custom selectors
     for (tHashSelectorEntry *elt = m_pHashForSelectors; elt != NULL; )
     {
         m_pCurrentTarget = elt;
@@ -827,7 +838,7 @@ void CCScheduler::update(float dt)
         }
     }
 
-    // Interate all over the script callbacks
+    // Iterate over all the script callbacks
     if (m_pScriptHandlerEntries)
     {
         for (int i = m_pScriptHandlerEntries->count() - 1; i >= 0; i--)
@@ -844,7 +855,7 @@ void CCScheduler::update(float dt)
         }
     }
 
-    // delete all updates that are morked for deletion
+    // delete all updates that are marked for deletion
     // updates with priority < 0
     DL_FOREACH_SAFE(m_pUpdatesNegList, pEntry, pTmp)
     {

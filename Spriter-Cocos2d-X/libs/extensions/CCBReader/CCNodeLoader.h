@@ -7,6 +7,18 @@
 
 NS_CC_EXT_BEGIN
 
+#define PROPERTY_POSITION "position"
+#define PROPERTY_CONTENTSIZE "contentSize"
+#define PROPERTY_ANCHORPOINT "anchorPoint"
+#define PROPERTY_SCALE "scale"
+#define PROPERTY_ROTATION "rotation"
+#define PROPERTY_TAG "tag"
+#define PROPERTY_IGNOREANCHORPOINTFORPOSITION "ignoreAnchorPointForPosition"
+#define PROPERTY_VISIBLE "visible"
+
+#define ASSERT_FAIL_UNEXPECTED_PROPERTY(PROPERTY) CCLog("Unexpected property: '%s'!\n", PROPERTY->getCString()); assert(false)
+#define ASSERT_FAIL_UNEXPECTED_PROPERTYTYPE(PROPERTYTYPE) CCLog("Unexpected property type: '%d'!\n", PROPERTYTYPE); assert(false)
+
 #define CCB_VIRTUAL_NEW_AUTORELEASE_CREATECCNODE_METHOD(T) virtual T * createCCNode(cocos2d::CCNode * pParent, cocos2d::extension::CCBReader * pCCBReader) { \
     return T::create(); \
 }
@@ -38,23 +50,23 @@ class CCNodeLoader : public CCObject {
     protected:
         CCB_VIRTUAL_NEW_AUTORELEASE_CREATECCNODE_METHOD(CCNode);
 
-        virtual CCPoint parsePropTypePosition(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
+        virtual CCPoint parsePropTypePosition(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader, const char *pPropertyName);
         virtual CCPoint parsePropTypePoint(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual CCPoint parsePropTypePointLock(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual CCSize parsePropTypeSize(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
-        virtual float * parsePropTypeScaleLock(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
+        virtual float * parsePropTypeScaleLock(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader, const char *pPropertyName);
         virtual float parsePropTypeFloat(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
-        virtual float parsePropTypeDegrees(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
+        virtual float parsePropTypeDegrees(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader, const char *pPropertyName);
         virtual float parsePropTypeFloatScale(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual int parsePropTypeInteger(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual int parsePropTypeIntegerLabeled(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual float * parsePropTypeFloatVar(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
-        virtual bool parsePropTypeCheck(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
-        virtual CCSpriteFrame * parsePropTypeSpriteFrame(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
+        virtual bool parsePropTypeCheck(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader, const char *pPropertyName);
+        virtual CCSpriteFrame * parsePropTypeSpriteFrame(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader, const char *pPropertyName);
         virtual CCAnimation * parsePropTypeAnimation(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual CCTexture2D * parsePropTypeTexture(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
-        virtual unsigned char parsePropTypeByte(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
-        virtual ccColor3B parsePropTypeColor3(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
+        virtual unsigned char parsePropTypeByte(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader, const char *pPropertyName);
+        virtual ccColor3B parsePropTypeColor3(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader, const char *pPropertyName);
         virtual ccColor4F * parsePropTypeColor4FVar(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual bool * parsePropTypeFlip(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);
         virtual ccBlendFunc parsePropTypeBlendFunc(CCNode * pNode, CCNode * pParent, CCBReader * pCCBReader);

@@ -163,7 +163,7 @@ void CCTexture2D::releaseData(void *data)
 void* CCTexture2D::keepData(void *data, unsigned int length)
 {
     CC_UNUSED_PARAM(length);
-    //The texture data mustn't be saved becuase it isn't a mutable texture.
+    //The texture data mustn't be saved because it isn't a mutable texture.
     return data;
 }
 
@@ -600,7 +600,7 @@ void CCTexture2D::PVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied)
 
 void CCTexture2D::generateMipmap()
 {
-    CCAssert( m_uPixelsWide == ccNextPOT(m_uPixelsWide) && m_uPixelsHigh == ccNextPOT(m_uPixelsHigh), "Mimpap texture only works in POT textures");
+    CCAssert( m_uPixelsWide == ccNextPOT(m_uPixelsWide) && m_uPixelsHigh == ccNextPOT(m_uPixelsHigh), "Mipmap texture only works in POT textures");
     ccGLBindTexture2D( m_uName );
     glGenerateMipmap(GL_TEXTURE_2D);
     m_bHasMipmaps = true;
@@ -622,6 +622,10 @@ void CCTexture2D::setTexParameters(ccTexParams *texParams)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texParams->magFilter );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParams->wrapS );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParams->wrapT );
+
+#if CC_ENABLE_CACHE_TEXTURE_DATA
+    VolatileTexture::setTexParameters(this, texParams);
+#endif
 }
 
 void CCTexture2D::setAliasTexParameters()
@@ -638,6 +642,10 @@ void CCTexture2D::setAliasTexParameters()
     }
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+#if CC_ENABLE_CACHE_TEXTURE_DATA
+    ccTexParams texParams = {m_bHasMipmaps?GL_NEAREST_MIPMAP_NEAREST:GL_NEAREST,GL_NEAREST,GL_NONE,GL_NONE};
+    VolatileTexture::setTexParameters(this, &texParams);
+#endif
 }
 
 void CCTexture2D::setAntiAliasTexParameters()
@@ -654,6 +662,10 @@ void CCTexture2D::setAntiAliasTexParameters()
     }
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+#if CC_ENABLE_CACHE_TEXTURE_DATA
+    ccTexParams texParams = {m_bHasMipmaps?GL_LINEAR_MIPMAP_NEAREST:GL_LINEAR,GL_LINEAR,GL_NONE,GL_NONE};
+    VolatileTexture::setTexParameters(this, &texParams);
+#endif
 }
 
 const char* CCTexture2D::stringForFormat()
@@ -691,7 +703,7 @@ const char* CCTexture2D::stringForFormat()
 			return  "PVRTC2";
 
 		default:
-			CCAssert(false , "unrecognised pixel format");
+			CCAssert(false , "unrecognized pixel format");
 			CCLOG("stringForFormat: %ld, cannot give useful result", (long)m_ePixelFormat);
 			break;
 	}
@@ -754,7 +766,7 @@ unsigned int CCTexture2D::bitsPerPixelForFormat(CCTexture2DPixelFormat format)
 			break;
 		default:
 			ret = -1;
-			CCAssert(false , "unrecognised pixel format");
+			CCAssert(false , "unrecognized pixel format");
 			CCLOG("bitsPerPixelForFormat: %ld, cannot give useful result", (long)format);
 			break;
 	}

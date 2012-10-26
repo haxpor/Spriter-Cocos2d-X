@@ -97,13 +97,19 @@ public:
     /** creates a CCSpriteBatchNode with a texture2d and capacity of children.
     The capacity will be increased in 33% in runtime if it run out of space.
     */
-    static CCSpriteBatchNode* createWithTexture(CCTexture2D* tex, unsigned int capacity = kDefaultSpriteBatchCapacity);
+    static CCSpriteBatchNode* createWithTexture(CCTexture2D* tex, unsigned int capacity);
+    static CCSpriteBatchNode* createWithTexture(CCTexture2D* tex) {
+        return CCSpriteBatchNode::createWithTexture(tex, kDefaultSpriteBatchCapacity);
+    }
 
     /** creates a CCSpriteBatchNode with a file image (.png, .jpeg, .pvr, etc) and capacity of children.
     The capacity will be increased in 33% in runtime if it run out of space.
     The file will be loaded using the TextureMgr.
     */
-    static CCSpriteBatchNode* create(const char* fileImage, unsigned int capacity = kDefaultSpriteBatchCapacity);
+    static CCSpriteBatchNode* create(const char* fileImage, unsigned int capacity);
+    static CCSpriteBatchNode* create(const char* fileImage) {
+        return CCSpriteBatchNode::create(fileImage, kDefaultSpriteBatchCapacity);
+    }
 
     /** initializes a CCSpriteBatchNode with a texture2d and capacity of children.
     The capacity will be increased in 33% in runtime if it run out of space.
@@ -151,12 +157,12 @@ public:
     virtual void draw(void);
 
 protected:
-    /* IMPORTANT XXX IMPORTNAT:
+    /* IMPORTANT XXX IMPORTANT:
     * These 2 methods can't be part of CCTMXLayer since they call [super add...], and CCSpriteSheet#add SHALL not be called
     */
 
     /* Adds a quad into the texture atlas but it won't be added into the children array.
-    This method should be called only when you are dealing with very big AtlasSrite and when most of the CCSprite won't be updated.
+    This method should be called only when you are dealing with very big AtlasSprite and when most of the CCSprite won't be updated.
     For example: a tile map (CCTMXMap) or a label with lots of characters (BitmapFontAtlas)
     */
     void addQuadFromSprite(CCSprite *sprite, unsigned int index);
@@ -174,7 +180,7 @@ protected:
     CCTextureAtlas *m_pobTextureAtlas;
     ccBlendFunc m_blendFunc;
 
-    // all descendants: chlidren, gran children, etc...
+    // all descendants: children, gran children, etc...
     CCArray* m_pobDescendants;
 };
 

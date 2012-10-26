@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
+Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2011      Erawppa
 http://www.cocos2d-x.org
 
@@ -46,9 +46,13 @@ public:
     
     void removeObserver(CCObject *target,const char *name);
     
+    void registerScriptObserver(int handler);
+    void unregisterScriptObserver(void);
+    
     void postNotification(const char *name);
     void postNotification(const char *name, CCObject *object);
     
+    inline int getScriptHandler() { return m_scriptHandler; };
 private:
     //
     // internal functions
@@ -59,6 +63,7 @@ private:
     // variables
     //
     CCArray *m_observers;
+    int     m_scriptHandler;
 };
 
 class CC_DLL CCNotificationObserver : public CCObject
